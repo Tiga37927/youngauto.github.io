@@ -1,0 +1,487 @@
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="author" content="Young">
+  
+  
+  
+  
+    <meta name="description" content="JavaScript实现
+文档对象模型（DOM）
+DOM是针对xml但经过扩展用于html的应用程序编程接口，dom把整个页面映射为一个多层节点结构
+
+DOM级别
+DOM1级1998.10由w3c推荐，有两个模块组成：DOM核心和DOM HTML。DOM核心规定如何映射基于xml的文档结构，以便简化对文档中任意部分的访问和操作。DOM HTML模块则在DOM核心的基础上加以扩展，添加了针对h...">
+  
+  <title>JavaScript读书笔记 [ walker ]</title>
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  <link rel="stylesheet" href="/css/random.css">
+<link rel="stylesheet" href="/css/vegas.min.css">
+<link rel="stylesheet" href="/css/highlight-railscasts.css">
+<link rel="stylesheet" href="/css/jquery.fancybox.css">
+<link rel="stylesheet" href="/css/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/jquery.fancybox-thumbs.css">
+<link rel="stylesheet" href="/css/plyr.css">
+  
+</head>
+
+<body>
+<div class="side-navigate hide-area">
+  
+    <div class="item prev">
+      <a href="/2017/08/28/fn/">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        常用方法实现
+      </div>
+    </div>
+  
+  
+    <div class="item next">
+      <a href="/2017/08/28/WebSecurity/">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        web安全
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onclick="openUserCard()">
+          <img id="avatar" src="/images/avator.png">
+          <div id="homelink">walker</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/">首页</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">文章</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/tags">标签</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/categories">分类</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">关于</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/youngauto">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>JavaScript读书笔记</h1>
+    <p class="page-title-sub">
+      <span id="post-title-date">撰写于 2017-08-28</span>
+      
+        <span id="post-title-updated">修改于 2019-11-07</span>
+      
+      
+      <span id="post-title-categories">分类
+      
+      
+        
+        
+        <a href="/categories/js/">js</a>
+      
+        
+          /
+        
+        
+        <a href="/categories/js/笔记/">笔记</a>
+      
+      </span>
+      
+      
+      <span id="post-title-tags">
+      标签
+      
+      
+        
+        
+        <a href="/tags/js/">js</a>
+      
+      </span>
+      
+    </p>
+    
+    <h3 id="JavaScript实现"><a href="#JavaScript实现" class="headerlink" title="JavaScript实现"></a>JavaScript实现</h3><ul>
+<li><p>文档对象模型（DOM）</p>
+<p>DOM是针对xml但经过扩展用于html的应用程序编程接口，dom把整个页面映射为一个多层节点结构</p>
+</li>
+<li><p>DOM级别</p>
+<p>DOM1级1998.10由w3c推荐，有两个模块组成：DOM核心和DOM HTML。DOM核心规定如何映射基于xml的文档结构，以便简化对文档中任意部分的访问和操作。DOM HTML模块则在DOM核心的基础上加以扩展，添加了针对html的对象和方法</p>
+<p>DOM2在原来的DOM基础上又扩充了鼠标和用户界面事件、范围、遍历等细分模块，而且通过对象接口增加了对css的支持</p>
+<p>DOM3进一步扩展了DOM，引入了以统一方式加载和保存文档的方法</p>
+</li>
+<li><p>其他DOM标准</p>
+<p>以下语言都是基于xml的，每种语言的DOM标准都添加了与特定语言相关的新方法和接口：</p>
+<p>SVG</p>
+<p>MathML</p>
+<p>SMIL</p>
+</li>
+<li><p>浏览器对象模型（BOM）</p>
+<p>BOM只处理浏览器窗口和框架，提供与浏览器交互的方法和接口，如window、navigator</p>
+</li>
+</ul>
+<h3 id="html中使用JavaScript"><a href="#html中使用JavaScript" class="headerlink" title="html中使用JavaScript"></a>html中使用JavaScript</h3><ul>
+<li><p><script>元素</p>
+<p>用于向html页面插入JavaScript，有如下属性</p>
+<ul>
+<li>async：可选，表示应该立即下载脚本，但不妨碍页面中的其他操作，不保证执行时间</li>
+<li>defer：可选，表示脚本立即下载，但延迟执行，现实中，多个延迟脚本并不会按顺序执行，因此最好只包含一个延迟脚本</li>
+</ul>
+</li>
+<li><p>在XHTML中的用法</p>
+<ul>
+<li>xhtml是基于xml的应用而重新定义的一个标准，编写XHTML比html严格得多，直接影响能否在嵌入javascript代码时使用<script />标签，比如a &lt; b，XHTML会将&lt; 解析为标签，这里需要使用’&amp; l t;’代替</li>
+</ul>
+</li>
+</ul>
+<p>###文档模式</p>
+<ul>
+<li>doctype是通过使用文档类型切换实现的，最初的两种文档模式是：混杂模式和标准模式。混杂模式会让IE的行为与IE5相同，而标准模式则让IE的行为更接近标准行为。这两种模式主要影响Css内容的呈现，某些情况下也会影响到js的解释执行</li>
+</ul>
+<h3 id="typeof操作符"><a href="#typeof操作符" class="headerlink" title="typeof操作符"></a>typeof操作符</h3><ul>
+<li><p>“undefined”—未定义</p>
+<ul>
+<li>声明变量但未对其加以初始化，但对未声明的变量也会返回undefined</li>
+</ul>
+</li>
+<li><p>“boolean”—布尔值</p>
+<ul>
+<li><p>只有true和false两个值，但是其他类型有等价的值</p>
+<p>| 数据类型      | 转换为true的值 | 转换为false的值 |<br>| ——— | ——— | ———- |<br>| Boolean   | true      | false      |<br>| String    | 任何非空字符串   | “”（空字符串）   |<br>| Number    | 任何非零的数字   | 0和NaN      |<br>| Object    | 任何对象      | null       |<br>| Undefined |           | undefined  |<br>|           |           |            |</p>
+</li>
+</ul>
+</li>
+<li><p>“string”—字符串</p>
+<ul>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">不可变</span><br><span class="line">var lang = &quot;Java&quot;;</span><br><span class="line">lang = lang + &quot;Script&quot;;</span><br><span class="line">首先创建一个能容纳是个字符的新字符串，然后在这个字符串中填充&quot;Java&quot;和&quot;Script&quot;,最后一步是消回原来的字符串&quot;Java&quot;和&quot;Script&quot;，因此字符串的拼接很慢</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>转换为字符串</p>
+<p>第一种使用每个值的toString方法（null，undefined没有）；第二种，不知道类型，使用String()</p>
+</li>
+</ul>
+</li>
+<li><p>“number”—数字</p>
+<ul>
+<li><p>浮点数值</p>
+<p>浮点数值中必须包含一个小数点，小数点后面必须至少有一位数字，最高精度17位</p>
+</li>
+<li><p>数值范围</p>
+<p>5e-324~1.7976931348623157e+308，超出的会被转换成-Infinity或者Infinity</p>
+</li>
+<li><p>NaN</p>
+<p>任何数除以0会返回NaN，isNaN()用于判断是否”不是数值”</p>
+</li>
+<li><p>数值转换</p>
+<p>Number()用于任何数据类型，parseInt()、parseFloat()转换字符串</p>
+</li>
+</ul>
+</li>
+<li><p>“object”—对象或者null</p>
+<ul>
+<li>null只有一个值，就是null，表示空指针对象，undefined == null // true</li>
+</ul>
+</li>
+<li><p>“function”—函数</p>
+</li>
+</ul>
+<h3 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h3><ul>
+<li><p>一元操作符</p>
+<ul>
+<li><p>只能操作一个值的操作符</p>
+</li>
+<li><p>当执行前置递增和递减操作时，变量的值都是在语句被求值以前改变的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var age = 29;</span><br><span class="line">var anotherAge = --age + 2;</span><br><span class="line">alert(age); // 28</span><br><span class="line">alert(anotherAge); //30</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>后置递增和递减操作，变量的值都是在语句被求值以后改变</p>
+</li>
+</ul>
+</li>
+<li><p>一元加和减操作符</p>
+<ul>
+<li>用于基本算术运算</li>
+</ul>
+</li>
+</ul>
+</script></p></li></ul>
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">显示目录</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">隐藏目录</button>
+  <div class="random-toc">
+    <h2>目录</h2>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#JavaScript实现"><span class="toc-text">JavaScript实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#html中使用JavaScript"><span class="toc-text">html中使用JavaScript</span></a></li></ol>
+  </div>
+</div>
+
+  
+<nav id="pagination">
+  
+    <a href="/2017/08/28/fn/" class="prev">&larr; 上一篇 常用方法实现</a>
+  
+
+  
+
+  
+    <a href="/2017/08/28/WebSecurity/" class="next">下一篇 web安全 &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+
+      
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      Site by Young using
+      <a href="http://hexo.io">Hexo</a> & <a href="https://github.com/stiekel/hexo-theme-random">Random</a>
+      <br>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+<div id="user-card">
+  <div class="center-field">
+    <img class="avatar" src="/images/avator.png">
+    <p id="description">web前端,javascript,react,vue,webpack等工作记录</p>
+    <ul class="social-icon">
+  
+  
+    <li>
+      <a href="https://github.com/youngauto">
+        
+          <i class="icon iconfont github">&#xe606;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="https://coding.net/u/Stiekel">
+        
+          <i class="icon iconfont coding">&#xe607;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="https://twitter.com/SidCN">
+        
+          <i class="icon iconfont twitter">&#xe600;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://weibo.com/sidcn">
+        
+          <i class="icon iconfont weibo">&#xe602;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://www.douban.com/people/Stiekel/">
+        
+          <i class="icon iconfont douban">&#xe60f;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://chensd.com/feed">
+        
+          <i class="icon iconfont rss">&#xe60e;</i>
+        
+      </a>
+    </li>
+  
+</ul>
+  </div>
+</div>
+
+
+<div id="btn-view">Hide</div>
+
+<script>
+// is trigger analytics / tongji script
+var isIgnoreHost = false;
+
+if(window && window.location && window.location.host) {
+  isIgnoreHost = ["localhost","127.0.0.1"].some(function(address){
+    return 0 === window.location.host.indexOf(address);
+  });
+}
+
+var isTriggerAnalytics = !( true && isIgnoreHost );
+
+</script>
+
+
+
+
+  
+  
+    <script src="/js/jquery-2.2.3.min.js"></script>
+  
+    <script src="/js/vegas.min.js"></script>
+  
+    <script src="/js/random.js"></script>
+  
+    <script src="/js/highlight.pack.js"></script>
+  
+    <script src="/js/jquery.mousewheel.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox-thumbs.js"></script>
+  
+    <script src="/js/plyr.js"></script>
+  
+
+<script>
+
+  // fancybox
+  var backgroundImages = [];
+  
+  $('#post').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox') || $(this).parent().hasClass('fancybox-thumb')) return;
+      var alt = this.alt || this.title;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'post' + i);
+    });
+  });
+  $(".fancybox").fancybox();
+
+var vegasConfig = {"preload­Image":true,"transition":["slideLeft2","slideRight2","flash2"],"timer":true,"delay":5000,"shuffle":true,"count":10};
+var unsplashConfig = {"gravity":"north"};
+// is show background images
+var turnoffBackgroundImage = false;
+
+
+
+  turnoffBackgroundImage = true;
+
+
+var backgroundColor = "34495E";
+
+$(".fancybox-thumb").fancybox({
+  prevEffect: 'none',
+  nextEffect: 'none',
+  helpers: {
+    title: {
+      type: 'outside'
+    },
+    thumbs: {
+      width: 50,
+      height: 50
+    }
+  }
+});
+
+// show video with plyr
+$(".video-container iframe").each(function(i){
+  var url = $(this).attr('src');
+  var id = url.split('/').pop();
+  var plyrContainer = document.createElement('div');
+  plyrContainer.className = 'plyr';
+  var plyrElement = document.createElement('div');
+  plyrElement.dataset.videoId = id;
+  switch(true) {
+    case url.search('youtube.com') >= 0:
+      plyrElement.dataset.type = 'youtube';
+      break;
+    case url.search('vimeo.com') >= 0:
+      plyrElement.dataset.type = 'vimeo';
+      break;
+    default:
+      return;
+  };
+  plyrContainer.appendChild(plyrElement);
+  $(this).parent().html(plyrContainer);
+});
+plyr.setup('.plyr', {iconUrl: '/css/sprite.svg'});
+</script>
+</body>
+</html>
+

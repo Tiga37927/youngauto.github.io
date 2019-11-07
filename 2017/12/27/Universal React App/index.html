@@ -1,0 +1,494 @@
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="author" content="Young">
+  
+  
+  
+  
+    <meta name="description" content="前后端分离不在满足于SPA这种物理层面的分离，而是MVC业务层的分离，因此，如果前端掌握Controller，一切就简单了
+客户端渲染 vs 服务端渲染 vs 同构
+######客户端渲染
+页面在js、css等资源文件加载完成后开始渲染，路由为客户端路由，也就是我们经常谈到的SPA
+服务端渲染页面由服务端直接返回给浏览器，路由为服务端路由，URL的变更刷新页面
+同构英文表述为Isomorph...">
+  
+  <title>服务端渲染与react同构 [ walker ]</title>
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  <link rel="stylesheet" href="/css/random.css">
+<link rel="stylesheet" href="/css/vegas.min.css">
+<link rel="stylesheet" href="/css/highlight-railscasts.css">
+<link rel="stylesheet" href="/css/jquery.fancybox.css">
+<link rel="stylesheet" href="/css/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/jquery.fancybox-thumbs.css">
+<link rel="stylesheet" href="/css/plyr.css">
+  
+</head>
+
+<body>
+<div class="side-navigate hide-area">
+  
+    <div class="item prev">
+      <a href="/2018/01/22/blog-express/">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        基于express的博客
+      </div>
+    </div>
+  
+  
+    <div class="item next">
+      <a href="/2017/10/20/spring-boot/">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        spring boot高程读书笔记
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onclick="openUserCard()">
+          <img id="avatar" src="/images/avator.png">
+          <div id="homelink">walker</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/">首页</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">文章</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/tags">标签</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/categories">分类</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">关于</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/youngauto">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>服务端渲染与react同构</h1>
+    <p class="page-title-sub">
+      <span id="post-title-date">撰写于 2017-12-27</span>
+      
+        <span id="post-title-updated">修改于 2019-11-07</span>
+      
+      
+      <span id="post-title-categories">分类
+      
+      
+        
+        
+        <a href="/categories/前端优化/">前端优化</a>
+      
+        
+          /
+        
+        
+        <a href="/categories/前端优化/react/">react</a>
+      
+        
+          /
+        
+        
+        <a href="/categories/前端优化/react/nodejs/">nodejs</a>
+      
+      </span>
+      
+      
+      <span id="post-title-tags">
+      标签
+      
+      
+        
+        
+        <a href="/tags/nodejs/">nodejs</a>
+      
+        
+          /
+        
+        
+        <a href="/tags/seo/">seo</a>
+      
+        
+          /
+        
+        
+        <a href="/tags/同构/">同构</a>
+      
+        
+          /
+        
+        
+        <a href="/tags/reactjs16/">reactjs16</a>
+      
+        
+          /
+        
+        
+        <a href="/tags/react-router-v4/">react-router-v4</a>
+      
+        
+          /
+        
+        
+        <a href="/tags/redux/">redux</a>
+      
+      </span>
+      
+    </p>
+    
+    <h5 id="前后端分离不在满足于SPA这种物理层面的分离，而是MVC业务层的分离，因此，如果前端掌握Controller，一切就简单了"><a href="#前后端分离不在满足于SPA这种物理层面的分离，而是MVC业务层的分离，因此，如果前端掌握Controller，一切就简单了" class="headerlink" title="前后端分离不在满足于SPA这种物理层面的分离，而是MVC业务层的分离，因此，如果前端掌握Controller，一切就简单了"></a>前后端分离不在满足于SPA这种物理层面的分离，而是MVC业务层的分离，因此，如果前端掌握Controller，一切就简单了</h5><ul>
+<li><p>客户端渲染 vs 服务端渲染 vs 同构</p>
+<p>######客户端渲染</p>
+<p>页面在js、css等资源文件加载完成后开始渲染，路由为客户端路由，也就是我们经常谈到的SPA</p>
+<h6 id="服务端渲染"><a href="#服务端渲染" class="headerlink" title="服务端渲染"></a>服务端渲染</h6><p>页面由服务端直接返回给浏览器，路由为服务端路由，URL的变更刷新页面</p>
+<h6 id="同构"><a href="#同构" class="headerlink" title="同构"></a>同构</h6><p>英文表述为Isomorphic或Universal，即编写的js可同时运行于浏览器及Node.js两套环境中，用服务端渲染来提升首屏的加载速度，首屏之后的路由由客户端控制，即在用户到达首屏后，整个应用仍是一个SPA</p>
+</li>
+</ul>
+<ul>
+<li>总体架构</li>
+</ul>
+<p>详见：<a href="https://medium.com/leanjs/universal-create-react-app-step-by-step-b80ba68d125d" target="_blank" rel="noopener">https://medium.com/leanjs/universal-create-react-app-step-by-step-b80ba68d125d</a></p>
+<h3 id="Step-1"><a href="#Step-1" class="headerlink" title="Step 1"></a>Step 1</h3><ul>
+<li><p>create-react-app my-app</p>
+</li>
+<li><p>npm run eject 要修改一些配置</p>
+</li>
+<li><p>创建三个文件夹</p>
+<p>src/client<br>src/server<br>src/shared</p>
+</li>
+<li><p>/client</p>
+<p>src/index.js–&gt;src/client/index.js</p>
+<p>src/index.css–&gt;src/client/index.css</p>
+<p>src/registerServiceWorker.js to src/client/registerServiceWorker.js</p>
+<p>copy App.css内容到client/index.css里面</p>
+<p>添加react-router-dom，修改/client/index.js内容：</p>
+<ul>
+<li>Replace import App from ‘./App’; for import App from ‘../shared/App’;</li>
+<li>Add import { BrowserRouter as Router } from ‘react-router-dom’</li>
+<li>Replace<br>ReactDOM.render(<app>, document.getElementById(‘root’));<br>with:<br>ReactDOM.render(<br> <router><app></app></router>,<br> document.getElementById(‘root’)<br>);</app></li>
+</ul>
+</li>
+<li><p>/shared</p>
+<ul>
+<li>src/App.js to src/shared/App.js</li>
+<li>src/App.test.js to src/shared/App.test.js</li>
+<li>src/logo.svg to src/shared/logo.svg</li>
+</ul>
+</li>
+<li><p>/server</p>
+<ul>
+<li>src/server/index.js</li>
+<li>src/server/app.js</li>
+<li>src/server/render.js</li>
+<li>yarn add express nodemon webpack-node-externals http-proxy-middleware isomorphic-fetch</li>
+</ul>
+</li>
+</ul>
+<h3 id="Step-2"><a href="#Step-2" class="headerlink" title="Step 2"></a>Step 2</h3><p>​    <strong>/src/server/index.js</strong></p>
+<ul>
+<li><p>1.创建和启动服务</p>
+</li>
+<li><p>2.如果是生产环境，要代理url路径</p>
+</li>
+</ul>
+<ul>
+<li><p>3.根据根路径映射url资源<code>app.use(‘/’, express.static(‘build/client’))</code></p>
+</li>
+<li><p>4.使用与react相关</p>
+<h4 id="src-server-app-js"><a href="#src-server-app-js" class="headerlink" title="/src/server/app.js"></a>/src/server/app.js</h4></li>
+<li><p>接收请求，处理路由</p>
+<h4 id="src-server-render-js"><a href="#src-server-render-js" class="headerlink" title="/src/server/render.js"></a>/src/server/render.js</h4></li>
+<li><p>渲染Dom</p>
+</li>
+</ul>
+<h3 id="Step-3"><a href="#Step-3" class="headerlink" title="Step 3"></a>Step 3</h3><p>​    /package.json</p>
+<p>​    add:</p>
+<p>​    “serve”: “NODE_ENV=production node ./build/server/bundle.js”,</p>
+<p>​        “build-client”: “node scripts/build-client.js”,</p>
+<pre><code>&quot;build-server&quot;: &quot;node scripts/build-server.js&quot;,
+
+ &quot;build&quot;: &quot;npm run build-client &amp;&amp; npm run build-server&quot;
+</code></pre>
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">显示目录</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">隐藏目录</button>
+  <div class="random-toc">
+    <h2>目录</h2>
+    <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#前后端分离不在满足于SPA这种物理层面的分离，而是MVC业务层的分离，因此，如果前端掌握Controller，一切就简单了"><span class="toc-text">前后端分离不在满足于SPA这种物理层面的分离，而是MVC业务层的分离，因此，如果前端掌握Controller，一切就简单了</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#服务端渲染"><span class="toc-text">服务端渲染</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#同构"><span class="toc-text">同构</span></a></li></ol></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-1"><span class="toc-text">Step 1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-2"><span class="toc-text">Step 2</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#src-server-app-js"><span class="toc-text">/src/server/app.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#src-server-render-js"><span class="toc-text">/src/server/render.js</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-3"><span class="toc-text">Step 3</span></a>
+  </li></div>
+</div>
+
+  
+<nav id="pagination">
+  
+    <a href="/2018/01/22/blog-express/" class="prev">&larr; 上一篇 基于express的博客</a>
+  
+
+  
+
+  
+    <a href="/2017/10/20/spring-boot/" class="next">下一篇 spring boot高程读书笔记 &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+
+      
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      Site by Young using
+      <a href="http://hexo.io">Hexo</a> & <a href="https://github.com/stiekel/hexo-theme-random">Random</a>
+      <br>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+<div id="user-card">
+  <div class="center-field">
+    <img class="avatar" src="/images/avator.png">
+    <p id="description">web前端,javascript,react,vue,webpack等工作记录</p>
+    <ul class="social-icon">
+  
+  
+    <li>
+      <a href="https://github.com/youngauto">
+        
+          <i class="icon iconfont github">&#xe606;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="https://coding.net/u/Stiekel">
+        
+          <i class="icon iconfont coding">&#xe607;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="https://twitter.com/SidCN">
+        
+          <i class="icon iconfont twitter">&#xe600;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://weibo.com/sidcn">
+        
+          <i class="icon iconfont weibo">&#xe602;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://www.douban.com/people/Stiekel/">
+        
+          <i class="icon iconfont douban">&#xe60f;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://chensd.com/feed">
+        
+          <i class="icon iconfont rss">&#xe60e;</i>
+        
+      </a>
+    </li>
+  
+</ul>
+  </div>
+</div>
+
+
+<div id="btn-view">Hide</div>
+
+<script>
+// is trigger analytics / tongji script
+var isIgnoreHost = false;
+
+if(window && window.location && window.location.host) {
+  isIgnoreHost = ["localhost","127.0.0.1"].some(function(address){
+    return 0 === window.location.host.indexOf(address);
+  });
+}
+
+var isTriggerAnalytics = !( true && isIgnoreHost );
+
+</script>
+
+
+
+
+  
+  
+    <script src="/js/jquery-2.2.3.min.js"></script>
+  
+    <script src="/js/vegas.min.js"></script>
+  
+    <script src="/js/random.js"></script>
+  
+    <script src="/js/highlight.pack.js"></script>
+  
+    <script src="/js/jquery.mousewheel.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox-thumbs.js"></script>
+  
+    <script src="/js/plyr.js"></script>
+  
+
+<script>
+
+  // fancybox
+  var backgroundImages = [];
+  
+  $('#post').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox') || $(this).parent().hasClass('fancybox-thumb')) return;
+      var alt = this.alt || this.title;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'post' + i);
+    });
+  });
+  $(".fancybox").fancybox();
+
+var vegasConfig = {"preload­Image":true,"transition":["slideLeft2","slideRight2","flash2"],"timer":true,"delay":5000,"shuffle":true,"count":10};
+var unsplashConfig = {"gravity":"north"};
+// is show background images
+var turnoffBackgroundImage = false;
+
+
+
+  turnoffBackgroundImage = true;
+
+
+var backgroundColor = "34495E";
+
+$(".fancybox-thumb").fancybox({
+  prevEffect: 'none',
+  nextEffect: 'none',
+  helpers: {
+    title: {
+      type: 'outside'
+    },
+    thumbs: {
+      width: 50,
+      height: 50
+    }
+  }
+});
+
+// show video with plyr
+$(".video-container iframe").each(function(i){
+  var url = $(this).attr('src');
+  var id = url.split('/').pop();
+  var plyrContainer = document.createElement('div');
+  plyrContainer.className = 'plyr';
+  var plyrElement = document.createElement('div');
+  plyrElement.dataset.videoId = id;
+  switch(true) {
+    case url.search('youtube.com') >= 0:
+      plyrElement.dataset.type = 'youtube';
+      break;
+    case url.search('vimeo.com') >= 0:
+      plyrElement.dataset.type = 'vimeo';
+      break;
+    default:
+      return;
+  };
+  plyrContainer.appendChild(plyrElement);
+  $(this).parent().html(plyrContainer);
+});
+plyr.setup('.plyr', {iconUrl: '/css/sprite.svg'});
+</script>
+</body>
+</html>
+

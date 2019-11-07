@@ -1,0 +1,403 @@
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="author" content="Young">
+  
+  
+  
+  
+    <meta name="description" content="react学习记录
+react组件只能有一个顶层元素
+jsx实际是js对象，html标签可以抽象成js对象：标签、属性、子元素
+state的主要作用是用于组件保存、控制、修改自己的可变状态。state在组件内部初始化，可以被组件自身修改，而外部不能访问也不能修改。你可以认为state是一个局部的、只能被组件自身控制的数据源。state中状态可以通过this.setState方法进行更新，se...">
+  
+  <title>react-demo [ walker ]</title>
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  <link rel="stylesheet" href="/css/random.css">
+<link rel="stylesheet" href="/css/vegas.min.css">
+<link rel="stylesheet" href="/css/highlight-railscasts.css">
+<link rel="stylesheet" href="/css/jquery.fancybox.css">
+<link rel="stylesheet" href="/css/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/jquery.fancybox-thumbs.css">
+<link rel="stylesheet" href="/css/plyr.css">
+  
+</head>
+
+<body>
+<div class="side-navigate hide-area">
+  
+    <div class="item prev">
+      <a href="/2017/04/28/note170915/">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        笔记
+      </div>
+    </div>
+  
+  
+    <div class="item next">
+      <a href="/2017/04/15/ReactWebpack/">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        react-webpack
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onclick="openUserCard()">
+          <img id="avatar" src="/images/avator.png">
+          <div id="homelink">walker</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/">首页</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">文章</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/tags">标签</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/categories">分类</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">关于</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/youngauto">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>react-demo</h1>
+    <p class="page-title-sub">
+      <span id="post-title-date">撰写于 2017-04-17</span>
+      
+        <span id="post-title-updated">修改于 2019-11-07</span>
+      
+      
+      <span id="post-title-categories">分类
+      
+      
+        
+        
+        <a href="/categories/react/">react</a>
+      
+        
+          /
+        
+        
+        <a href="/categories/react/reactjs/">reactjs</a>
+      
+      </span>
+      
+      
+      <span id="post-title-tags">
+      标签
+      
+      
+        
+        
+        <a href="/tags/react/">react</a>
+      
+        
+          /
+        
+        
+        <a href="/tags/react组件/">react组件</a>
+      
+      </span>
+      
+    </p>
+    
+    <h3 id="react学习记录"><a href="#react学习记录" class="headerlink" title="react学习记录"></a>react学习记录</h3><ul>
+<li>react组件只能有一个顶层元素</li>
+<li>jsx实际是js对象，html标签可以抽象成js对象：标签、属性、子元素</li>
+<li>state的主要作用是用于组件保存、控制、修改自己的可变状态。state在组件内部初始化，可以被组件自身修改，而外部不能访问也不能修改。你可以认为state是一个局部的、只能被组件自身控制的数据源。state中状态可以通过<code>this.setState</code>方法进行更新，setState会导致组建的重新渲染。</li>
+<li>props的主要作用是让使用该组件的父组件可以传入参数来配置该组件。它是外部传进来的配置参数，组件内部无法控制也无法修改。除非外部组件主动传入，否则组建的props永远保持不变。</li>
+<li>状态提升：当某个状态被多个组件依赖或者影响的时候，就应该把状态提升到这些组件的最近公共父组件中去管理，用props传递数据或者函数来管理这种依赖或者影响的行为。</li>
+<li>最新版本，<code>PropTypes</code>不在react里，需要<code>npm i prop-types --save-dev</code>,在使用时使用import</li>
+<li>高阶函数：接受或返回一个函数的函数</li>
+<li>context: 一个组件可以通过<code>getChildContext</code>方法返回一个对象，这个对象就是子树的<code>context</code>，提供<code>context</code>的组件必须提供<code>childContextTypes</code>作为<code>context</code>的声明和验证</li>
+<li>如果一个组件设置了<code>context</code>，那么他的子组件都可以直接访问到里面的内容，他就像这个组件为根的子树的全局变量。任意深度的子组件都可以通过<code>contextTypes</code>来声明你想要的<code>context</code>里面的哪些状态，然后可以通过<code>this.context</code>访问到那些状态。</li>
+<li><code>context</code>打破了组件和组件之间通过<code>props</code>传递数据的规范，极大地增强了组件之间的耦合性。而且，就如同全局变量一样，<strong>context里面的数据能随意接触随意修改</strong>，每个组件都能够改<code>context</code>里面的内容</li>
+<li>但是这种机制对于前端应用状态管理来说很有帮助，因为毕竟很多状态都会在组件之间进行共享，context会给我们带来很大的方便。一些第三方的前端应用状态管理的库（例如redux）就是充分地利用了这种机制给我们提供便利的状态管理服务。但我们一般不需要手动写context，也不要用它，只需要用好这些第三方的应用状态管理库就行了</li>
+</ul>
+
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">显示目录</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">隐藏目录</button>
+  <div class="random-toc">
+    <h2>目录</h2>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#react学习记录"><span class="toc-text">react学习记录</span></a></li></ol>
+  </div>
+</div>
+
+  
+<nav id="pagination">
+  
+    <a href="/2017/04/28/note170915/" class="prev">&larr; 上一篇 笔记</a>
+  
+
+  
+
+  
+    <a href="/2017/04/15/ReactWebpack/" class="next">下一篇 react-webpack &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+
+      
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      Site by Young using
+      <a href="http://hexo.io">Hexo</a> & <a href="https://github.com/stiekel/hexo-theme-random">Random</a>
+      <br>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+<div id="user-card">
+  <div class="center-field">
+    <img class="avatar" src="/images/avator.png">
+    <p id="description">web前端,javascript,react,vue,webpack等工作记录</p>
+    <ul class="social-icon">
+  
+  
+    <li>
+      <a href="https://github.com/youngauto">
+        
+          <i class="icon iconfont github">&#xe606;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="https://coding.net/u/Stiekel">
+        
+          <i class="icon iconfont coding">&#xe607;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="https://twitter.com/SidCN">
+        
+          <i class="icon iconfont twitter">&#xe600;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://weibo.com/sidcn">
+        
+          <i class="icon iconfont weibo">&#xe602;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://www.douban.com/people/Stiekel/">
+        
+          <i class="icon iconfont douban">&#xe60f;</i>
+        
+      </a>
+    </li>
+  
+    <li>
+      <a href="http://chensd.com/feed">
+        
+          <i class="icon iconfont rss">&#xe60e;</i>
+        
+      </a>
+    </li>
+  
+</ul>
+  </div>
+</div>
+
+
+<div id="btn-view">Hide</div>
+
+<script>
+// is trigger analytics / tongji script
+var isIgnoreHost = false;
+
+if(window && window.location && window.location.host) {
+  isIgnoreHost = ["localhost","127.0.0.1"].some(function(address){
+    return 0 === window.location.host.indexOf(address);
+  });
+}
+
+var isTriggerAnalytics = !( true && isIgnoreHost );
+
+</script>
+
+
+
+
+  
+  
+    <script src="/js/jquery-2.2.3.min.js"></script>
+  
+    <script src="/js/vegas.min.js"></script>
+  
+    <script src="/js/random.js"></script>
+  
+    <script src="/js/highlight.pack.js"></script>
+  
+    <script src="/js/jquery.mousewheel.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox-thumbs.js"></script>
+  
+    <script src="/js/plyr.js"></script>
+  
+
+<script>
+
+  // fancybox
+  var backgroundImages = [];
+  
+  $('#post').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox') || $(this).parent().hasClass('fancybox-thumb')) return;
+      var alt = this.alt || this.title;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'post' + i);
+    });
+  });
+  $(".fancybox").fancybox();
+
+var vegasConfig = {"preload­Image":true,"transition":["slideLeft2","slideRight2","flash2"],"timer":true,"delay":5000,"shuffle":true,"count":10};
+var unsplashConfig = {"gravity":"north"};
+// is show background images
+var turnoffBackgroundImage = false;
+
+
+
+  turnoffBackgroundImage = true;
+
+
+var backgroundColor = "34495E";
+
+$(".fancybox-thumb").fancybox({
+  prevEffect: 'none',
+  nextEffect: 'none',
+  helpers: {
+    title: {
+      type: 'outside'
+    },
+    thumbs: {
+      width: 50,
+      height: 50
+    }
+  }
+});
+
+// show video with plyr
+$(".video-container iframe").each(function(i){
+  var url = $(this).attr('src');
+  var id = url.split('/').pop();
+  var plyrContainer = document.createElement('div');
+  plyrContainer.className = 'plyr';
+  var plyrElement = document.createElement('div');
+  plyrElement.dataset.videoId = id;
+  switch(true) {
+    case url.search('youtube.com') >= 0:
+      plyrElement.dataset.type = 'youtube';
+      break;
+    case url.search('vimeo.com') >= 0:
+      plyrElement.dataset.type = 'vimeo';
+      break;
+    default:
+      return;
+  };
+  plyrContainer.appendChild(plyrElement);
+  $(this).parent().html(plyrContainer);
+});
+plyr.setup('.plyr', {iconUrl: '/css/sprite.svg'});
+</script>
+</body>
+</html>
+
